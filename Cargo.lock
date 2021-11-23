@@ -1162,16 +1162,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3e52c148ef37f8c375d49d5a73aa70713125b7f19095948a923f80afdeb22ec2"
 
 [[package]]
-name = "rust_base_webapp"
-version = "0.1.0"
-dependencies = [
- "actix-rt",
- "actix-web",
- "config",
- "reqwest",
-]
-
-[[package]]
 name = "rustc_version"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1441,6 +1431,16 @@ name = "stdweb-internal-runtime"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "213701ba3370744dcd1a12960caa4843b3d68b4d1c0a5d575e0d65b2ee9d16c0"
+
+[[package]]
+name = "study_google_auth"
+version = "0.1.0"
+dependencies = [
+ "actix-rt",
+ "actix-web",
+ "config",
+ "reqwest",
+]
 
 [[package]]
 name = "syn"

@@ -1,4 +1,4 @@
-use rust_base_webapp::{configuration::get_configuration, startup::Application};
+use study_google_auth::{configuration::get_configuration, startup::Application};
 
 pub struct TestApp {
     pub address: String,
