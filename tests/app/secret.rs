@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use reqwest::{cookie::Jar, StatusCode, Url};
+use reqwest::{cookie::Jar};
 use study_google_auth::auth::google;
 
 use crate::helper::spawn_app;
