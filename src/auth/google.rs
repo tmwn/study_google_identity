@@ -4,7 +4,7 @@ use anyhow::{anyhow, bail, Context};
 use jsonwebtoken::{decode_header, DecodingKey, TokenData, Validation};
 use once_cell::sync::Lazy;
 use reqwest::{header::CACHE_CONTROL, Response};
-use serde::{Deserialize};
+use serde::Deserialize;
 use tokio::sync::Mutex;
 
 use super::cache::Cache;
