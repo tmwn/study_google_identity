@@ -1,14 +1,18 @@
-use crate::helper::error_chain_fmt;
+use crate::{auth::google, configuration::AdminEmails, helper::error_chain_fmt};
 use actix_web::{
-    body::AnyBody, http::HeaderValue, Error, HttpRequest, HttpResponse, Responder, ResponseError,
+    body::AnyBody, http::HeaderValue, web, Error, HttpRequest, HttpResponse, Responder,
+    ResponseError,
 };
 use anyhow::anyhow;
-use reqwest::{header, Request, StatusCode};
+use reqwest::StatusCode;
+use serde::Deserialize;
 
 #[derive(thiserror::Error)]
 pub enum SecretError {
     #[error("Authenticaion failed")]
     AuthError(#[source] anyhow::Error),
+    #[error("Access forbidden")]
+    Forbidden(#[source] anyhow::Error),
 }
 
 impl std::fmt::Debug for SecretError {
@@ -27,15 +31,26 @@ impl ResponseError for SecretError {
                 ));
                 response
             }
+            SecretError::Forbidden(_) => HttpResponse::new(StatusCode::FORBIDDEN),
         }
     }
 }
 
-pub async fn secret(req: HttpRequest) -> Result<HttpResponse, SecretError> {
-    let cred = req
-        .cookie("credential")
+pub async fn secret(
+    req: HttpRequest,
+    admins: web::Data<AdminEmails>,
+) -> Result<HttpResponse, SecretError> {
+    // TODO: CSRF prevention.
+    let google_jwt = req
+        .cookie(google::COOKIE_KEY)
         .ok_or(SecretError::AuthError(anyhow!(
             "credential not found in cookie"
         )))?;
+    let id = google::decode(google_jwt.value())
+        .await
+        .map_err(|e| SecretError::AuthError(e))?;
+    if !admins.contains(&id.email) {
+        return Err(SecretError::Forbidden(anyhow!("use is not admin")));
+    }
     Ok(HttpResponse::Ok().finish())
 }
