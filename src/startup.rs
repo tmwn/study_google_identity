@@ -2,7 +2,10 @@ use std::net::TcpListener;
 
 use actix_web::{dev::Server, web, App, HttpServer};
 
-use crate::{configuration::Settings, route::health_check::health_check};
+use crate::{
+    configuration::Settings,
+    route::{health_check::health_check, secret::secret},
+};
 
 pub struct Application {
     port: u16,
@@ -29,9 +32,12 @@ impl Application {
 }
 
 pub fn run(listener: TcpListener) -> std::io::Result<Server> {
-    let server =
-        HttpServer::new(move || App::new().route("/health_check", web::get().to(health_check)))
-            .listen(listener)?
-            .run();
+    let server = HttpServer::new(move || {
+        App::new()
+            .route("/health_check", web::get().to(health_check))
+            .route("/secret", web::get().to(secret))
+    })
+    .listen(listener)?
+    .run();
     Ok(server)
 }
