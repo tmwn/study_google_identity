@@ -1,4 +1,4 @@
-# Rust base web app
+# Study Google Identity
 
-This is the simplest web app that can be used as a basis for building a web app in Rust.
-I used zero2prod as a reference.
+This is a very simple web application that shows how to use Google Identity to
+allow only specific users to access resources.
