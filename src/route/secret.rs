@@ -36,7 +36,6 @@ pub async fn secret(
     req: HttpRequest,
     admins: web::Data<AdminEmails>,
 ) -> Result<HttpResponse, SecretError> {
-    // TODO: CSRF prevention.
     let google_jwt = req
         .cookie(google::COOKIE_KEY)
         .ok_or_else(|| SecretError::AuthError(anyhow!("credential not found in cookie")))?;
@@ -44,7 +43,7 @@ pub async fn secret(
         .await
         .map_err(SecretError::AuthError)?;
     if !admins.contains(&id.email) {
-        return Err(SecretError::Forbidden(anyhow!("use is not admin")));
+        return Err(SecretError::Forbidden(anyhow!("user is not admin")));
     }
-    Ok(HttpResponse::Ok().finish())
+    Ok(HttpResponse::Ok().body("got secret"))
 }

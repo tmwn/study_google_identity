@@ -108,7 +108,7 @@ mod tests {
     #[actix_rt::test]
     async fn google_jwks() {
         // TODO: use fake backend.
-        let x = get_key("032b2ef3d2c2806157f8a9b9f4ef779834f85ada")
+        let x = get_key("9341abc4092b6fc038e403c91022dd3e44539b56")
             .await
             .unwrap();
         assert_eq!(x.alg, "RS256");

@@ -4,7 +4,11 @@ use actix_web::{dev::Server, web, App, HttpServer};
 
 use crate::{
     configuration::{AdminEmails, Settings},
-    route::{health_check::health_check, secret::secret},
+    route::{
+        health_check::health_check,
+        login::{login, login_endpoint},
+        secret::secret,
+    },
 };
 
 pub struct Application {
@@ -35,8 +39,11 @@ pub fn run(listener: TcpListener, admin_emails: AdminEmails) -> std::io::Result<
     let admin_emails = web::Data::new(admin_emails);
     let server = HttpServer::new(move || {
         App::new()
+            // .wrap(SayHi)
             .route("/health_check", web::get().to(health_check))
             .route("/secret", web::get().to(secret))
+            .route("/login", web::get().to(login))
+            .route("/login", web::post().to(login_endpoint))
             .app_data(admin_emails.clone())
     })
     .listen(listener)?
