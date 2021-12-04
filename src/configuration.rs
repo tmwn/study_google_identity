@@ -40,8 +40,8 @@ pub fn get_configuration<'a>() -> Settings {
         },
         auth: AuthSettings {
             admin_google_emails: AdminEmails(vec!["tmwn@tmwn.org"]),
-            encoding_key: encoding_key,
-            decoding_key: decoding_key,
+            encoding_key,
+            decoding_key,
         },
     }
 }
