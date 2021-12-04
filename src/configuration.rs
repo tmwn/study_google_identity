@@ -1,3 +1,5 @@
+use jsonwebtoken::{DecodingKey, EncodingKey};
+
 pub struct Settings {
     pub application: ApplicationSettings,
     pub auth: AuthSettings,
@@ -18,9 +20,15 @@ impl AdminEmails {
 
 pub struct AuthSettings {
     pub admin_google_emails: AdminEmails,
+    pub encoding_key: EncodingKey,
+    pub decoding_key: DecodingKey<'static>,
 }
 
-pub fn get_configuration() -> Settings {
+pub fn get_configuration<'a>() -> Settings {
+    let secret = std::env::var("SECRET").unwrap();
+    let encoding_key = EncodingKey::from_secret(secret.as_bytes());
+    let decoding_key = DecodingKey::from_secret(secret.as_bytes()).into_static();
+
     // Hint: use config crate to use different settings for dev and prod.
     Settings {
         application: ApplicationSettings {
@@ -29,6 +37,8 @@ pub fn get_configuration() -> Settings {
         },
         auth: AuthSettings {
             admin_google_emails: AdminEmails(vec!["tmwn@tmwn.org"]),
+            encoding_key: encoding_key,
+            decoding_key: decoding_key,
         },
     }
 }

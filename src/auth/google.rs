@@ -4,7 +4,7 @@ use anyhow::{anyhow, bail, Context};
 use jsonwebtoken::{decode_header, DecodingKey, TokenData, Validation};
 use once_cell::sync::Lazy;
 use reqwest::{header::CACHE_CONTROL, Response};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 
 use super::cache::Cache;
@@ -37,7 +37,7 @@ pub struct JWK {
     kty: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GoogleId {
     pub email: String,
 }

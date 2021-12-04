@@ -3,7 +3,7 @@ use std::net::TcpListener;
 use actix_web::{dev::Server, web, App, HttpServer};
 
 use crate::{
-    configuration::{AdminEmails, Settings},
+    configuration::{AuthSettings, Settings},
     route::{
         health_check::health_check,
         login::{login, login_endpoint},
@@ -24,7 +24,7 @@ impl Application {
         );
         let listener = TcpListener::bind(address)?;
         let port = listener.local_addr().unwrap().port();
-        let server = run(listener, configuration.auth.admin_google_emails)?;
+        let server = run(listener, configuration.auth)?;
         Ok(Application { port, server })
     }
     pub fn port(&self) -> u16 {
@@ -35,8 +35,8 @@ impl Application {
     }
 }
 
-pub fn run(listener: TcpListener, admin_emails: AdminEmails) -> std::io::Result<Server> {
-    let admin_emails = web::Data::new(admin_emails);
+pub fn run<'a>(listener: TcpListener, auth_settings: AuthSettings) -> std::io::Result<Server> {
+    let auth_settings = web::Data::new(auth_settings);
     let server = HttpServer::new(move || {
         App::new()
             // .wrap(SayHi)
@@ -44,7 +44,7 @@ pub fn run(listener: TcpListener, admin_emails: AdminEmails) -> std::io::Result<
             .route("/secret", web::get().to(secret))
             .route("/login", web::get().to(login))
             .route("/login", web::post().to(login_endpoint))
-            .app_data(admin_emails.clone())
+            .app_data(auth_settings.clone())
     })
     .listen(listener)?
     .run();
