@@ -26,6 +26,9 @@ pub struct AuthSettings {
 
 pub fn get_configuration<'a>() -> Settings {
     let secret = std::env::var("SECRET").unwrap();
+    if secret.len() < 3 {
+        panic!("Secret too short");
+    }
     let encoding_key = EncodingKey::from_secret(secret.as_bytes());
     let decoding_key = DecodingKey::from_secret(secret.as_bytes()).into_static();
 
@@ -33,7 +36,7 @@ pub fn get_configuration<'a>() -> Settings {
     Settings {
         application: ApplicationSettings {
             port: 8080,
-            host: "127.0.0.1".into(),
+            host: "0.0.0.0".into(),
         },
         auth: AuthSettings {
             admin_google_emails: AdminEmails(vec!["tmwn@tmwn.org"]),

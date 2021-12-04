@@ -100,6 +100,7 @@ pub async fn login_endpoint(
     let current_timestamp = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
         .map_err(|e| LoginError::InternalError(e.into()))?;
+    // Token expires in 60 seconds.
     let exp = current_timestamp.as_secs() as usize + 60;
     let claim = Claims { exp, id };
 
