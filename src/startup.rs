@@ -3,7 +3,7 @@ use std::net::TcpListener;
 use actix_web::{dev::Server, web, App, HttpServer};
 
 use crate::{
-    configuration::{AuthSettings, Settings},
+    configuration::Settings,
     route::{
         health_check::health_check,
         login::{login, login_endpoint},
@@ -24,7 +24,7 @@ impl Application {
         );
         let listener = TcpListener::bind(address)?;
         let port = listener.local_addr().unwrap().port();
-        let server = run(listener, configuration.auth)?;
+        let server = run(listener, configuration)?;
         Ok(Application { port, server })
     }
     pub fn port(&self) -> u16 {
@@ -35,8 +35,9 @@ impl Application {
     }
 }
 
-pub fn run<'a>(listener: TcpListener, auth_settings: AuthSettings) -> std::io::Result<Server> {
-    let auth_settings = web::Data::new(auth_settings);
+pub fn run<'a>(listener: TcpListener, settings: Settings) -> std::io::Result<Server> {
+    let auth_settings = web::Data::new(settings.auth);
+    let application_settings = web::Data::new(settings.application);
     let server = HttpServer::new(move || {
         App::new()
             .route("/health_check", web::get().to(health_check))
@@ -44,6 +45,7 @@ pub fn run<'a>(listener: TcpListener, auth_settings: AuthSettings) -> std::io::R
             .route("/login", web::get().to(login))
             .route("/login", web::post().to(login_endpoint))
             .app_data(auth_settings.clone())
+            .app_data(application_settings.clone())
     })
     .listen(listener)?
     .run();

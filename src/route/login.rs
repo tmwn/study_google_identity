@@ -10,12 +10,10 @@ use serde::Deserialize;
 
 use crate::auth::claim::Claims;
 use crate::auth::google;
-use crate::configuration::AuthSettings;
+use crate::configuration::{ApplicationSettings, AuthSettings};
 use crate::helper::error_chain_fmt;
 
-const CLIENT_ID: &str = "917732578375-3tpjt3d19phubohmheel57b5hn7g1fl0.apps.googleusercontent.com";
-
-pub async fn login() -> impl Responder {
+pub async fn login(settings: web::Data<ApplicationSettings>) -> impl Responder {
     let body = format!(
         r#"
     <html>
@@ -37,7 +35,7 @@ pub async fn login() -> impl Responder {
     </body>
   </html>
     "#,
-        CLIENT_ID
+        settings.client_id,
     );
     HttpResponse::Ok().body(body)
 }

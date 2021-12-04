@@ -8,6 +8,7 @@ pub struct Settings {
 pub struct ApplicationSettings {
     pub port: u16,
     pub host: String,
+    pub client_id: String,
 }
 
 pub struct AdminEmails(Vec<&'static str>);
@@ -31,12 +32,14 @@ pub fn get_configuration<'a>() -> Settings {
     }
     let encoding_key = EncodingKey::from_secret(secret.as_bytes());
     let decoding_key = DecodingKey::from_secret(secret.as_bytes()).into_static();
-
+    let client_id =
+        "471589670598-v8b71548rle4hpeaj6a7dcv25p7n7o8q.apps.googleusercontent.com".to_string();
     // Hint: use config crate to use different settings for dev and prod.
     Settings {
         application: ApplicationSettings {
             port: 8080,
             host: "0.0.0.0".into(),
+            client_id,
         },
         auth: AuthSettings {
             admin_google_emails: AdminEmails(vec!["tmwn@tmwn.org"]),
