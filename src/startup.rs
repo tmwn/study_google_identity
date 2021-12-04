@@ -39,7 +39,6 @@ pub fn run<'a>(listener: TcpListener, auth_settings: AuthSettings) -> std::io::R
     let auth_settings = web::Data::new(auth_settings);
     let server = HttpServer::new(move || {
         App::new()
-            // .wrap(SayHi)
             .route("/health_check", web::get().to(health_check))
             .route("/secret", web::get().to(secret))
             .route("/login", web::get().to(login))
