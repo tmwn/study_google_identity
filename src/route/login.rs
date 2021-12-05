@@ -21,7 +21,7 @@ pub async fn login(settings: web::Data<ApplicationSettings>) -> impl Responder {
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <div id="g_id_onload"
            data-client_id="{}"
-           data-login_uri="http://localhost:8080/login"
+           data-login_uri="/login"
            data-auto_prompt="false">
         </div>
         <div class="g_id_signin"
@@ -32,6 +32,7 @@ pub async fn login(settings: web::Data<ApplicationSettings>) -> impl Responder {
            data-shape="rectangular"
            data-logo_alignment="left">
         </div>
+
     </body>
   </html>
     "#,
