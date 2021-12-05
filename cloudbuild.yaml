@@ -1,5 +1,5 @@
 steps:
-  - name: "gcr.io/kaniko-project/executor:v1.6.0"
+  - name: "gcr.io/kaniko-project/executor:v1.7.0-debug"
     args:
       - --destination="$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA"
       - --cache=true
