@@ -8,7 +8,7 @@ RUN echo "fn main() {println!(\"if you see this, the build broke\")}" > src/main
 RUN cargo build --release
 RUN rm -f target/release/deps/study_google_auth*
 
-COPY . .
+COPY src src
 RUN cargo build --release
 
 ENTRYPOINT ["/app/target/release/study_google_auth"]
