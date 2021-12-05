@@ -1,15 +1,10 @@
 steps:
   - name: "gcr.io/kaniko-project/executor:v1.6.0"
     args:
-      - "--destination=$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA"
+      - --destination="$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA"
       - --cache=true
       - --cache-ttl=336h
       - --dockerfile=Dockerfile
-  # - name: gcr.io/cloud-builders/docker
-  #   args:
-  #     - push
-  #     - "$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA"
-  #   id: Push
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
     args:
       - run
@@ -27,7 +22,7 @@ images:
   - "$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA"
 options:
   substitutionOption: ALLOW_LOOSE
-  machineType: "N1_HIGHCPU_8"
+  # machineType: "N1_HIGHCPU_8"
 substitutions:
   _DEPLOY_REGION: us-central1
   _GCR_HOSTNAME: us.gcr.io
