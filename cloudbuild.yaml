@@ -2,9 +2,9 @@ steps:
   - name: "gcr.io/kaniko-project/executor:v1.7.0-debug"
     args:
       - --destination="$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA"
-      - --cache=true
-      - --cache-ttl=336h
       - --dockerfile=Dockerfile
+      - --cache=false
+      - --cache-ttl=336h
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
     args:
       - run
@@ -28,7 +28,6 @@ substitutions:
   _GCR_HOSTNAME: us.gcr.io
   _LABELS: gcb-trigger-id=bf06f441-21df-4a46-8021-6a555970bc5b
   _TRIGGER_ID: bf06f441-21df-4a46-8021-6a555970bc5b
-  _PLATFORM: managed
   _SERVICE_NAME: study-google-identity
 tags:
   - gcp-cloud-build-deploy-cloud-run
