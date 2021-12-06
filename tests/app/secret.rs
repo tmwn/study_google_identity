@@ -1,7 +1,11 @@
 use std::sync::Arc;
 
+use jsonwebtoken::{encode, Header};
 use reqwest::cookie::Jar;
-use study_google_auth::auth::google;
+use study_google_auth::{
+    auth::{claim::Claims, google::GoogleId},
+    route::login,
+};
 
 use crate::helper::spawn_app;
 
@@ -19,12 +23,20 @@ async fn secret_should_fail_if_no_credential() {
 }
 
 #[actix_rt::test]
-async fn secret_should_fail_if_credential_is_invalid() {
+async fn secret_should_fail_if_user_is_not_admin() {
     let app = spawn_app().await;
+
+    let claims = Claims {
+        exp: 60 * 60 * 24 * 365 * 1000, // 1000 years
+        id: GoogleId {
+            email: "foo@example.com".to_string(),
+        },
+    };
+    let token = encode(&Header::default(), &claims, &app.encoding_key).unwrap();
 
     let cookies = Jar::default();
     cookies.add_cookie_str(
-        &format!("{}=foobar", google::COOKIE_KEY),
+        &format!("{}={}", login::COOKIE_KEY, token),
         &app.address.parse().unwrap(),
     );
 
@@ -38,5 +50,5 @@ async fn secret_should_fail_if_credential_is_invalid() {
         .await
         .expect("Failed to execute request.");
 
-    assert_eq!(response.status(), 401);
+    assert_eq!(response.status(), 403);
 }

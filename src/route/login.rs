@@ -14,6 +14,8 @@ use crate::auth::google;
 use crate::configuration::{ApplicationSettings, AuthSettings};
 use crate::helper::error_chain_fmt;
 
+pub const COOKIE_KEY: &str = "login_token";
+
 pub async fn login(settings: web::Data<ApplicationSettings>) -> impl Responder {
     let body = format!(
         r#"
@@ -33,7 +35,6 @@ pub async fn login(settings: web::Data<ApplicationSettings>) -> impl Responder {
            data-shape="rectangular"
            data-logo_alignment="left">
         </div>
-
     </body>
   </html>
     "#,
@@ -107,14 +108,14 @@ pub async fn login_endpoint(
     // Encode the id with HS256 algorithm.
     let token = encode(&Header::default(), &claim, &settings.encoding_key)
         .map_err(|e| LoginError::InternalError(e.into()))?;
-    let cookie = Cookie::build("login_token", token).http_only(true).finish();
+    let cookie = Cookie::build(COOKIE_KEY, token).http_only(true).finish();
     res.add_cookie(&cookie).unwrap();
     Ok(res)
 }
 
-pub fn check_login(req: &ServiceRequest, settings: &AuthSettings) -> Result<Claims, LoginError> {
+pub fn check_admin(req: &ServiceRequest, settings: &AuthSettings) -> Result<Claims, LoginError> {
     let token = req
-        .cookie("login_token")
+        .cookie(COOKIE_KEY)
         .ok_or_else(|| LoginError::AuthError(anyhow::anyhow!("credential not found in cookie")))?;
 
     let data = decode::<Claims>(
@@ -123,5 +124,8 @@ pub fn check_login(req: &ServiceRequest, settings: &AuthSettings) -> Result<Clai
         &Validation::default(),
     )
     .map_err(|e| LoginError::AuthError(anyhow::anyhow!("decode failed: {}", e)))?;
+    if !settings.admin_google_emails.contains(&data.claims.id.email) {
+        return Err(LoginError::Forbidden(anyhow::anyhow!("Not admin")));
+    }
     Ok(data.claims)
 }

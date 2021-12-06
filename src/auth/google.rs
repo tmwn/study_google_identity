@@ -9,8 +9,6 @@ use tokio::sync::Mutex;
 
 use super::cache::Cache;
 
-pub const COOKIE_KEY: &str = "google_jwt";
-
 // Decode Google-provided JWT token with validation.
 pub async fn decode(token: &str) -> anyhow::Result<GoogleId> {
     let header = decode_header(token).context("failed to decode header")?;

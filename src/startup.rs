@@ -9,7 +9,7 @@ use crate::{
     configuration::{AuthSettings, Settings},
     route::{
         health_check::health_check,
-        login::{check_login, login, login_endpoint},
+        login::{self, login, login_endpoint},
         secret::secret,
     },
 };
@@ -49,10 +49,11 @@ pub fn run(listener: TcpListener, settings: Settings) -> std::io::Result<Server>
             .route("/login", web::get().to(login))
             .route("/login", web::post().to(login_endpoint))
             .route("/health_check", web::get().to(health_check))
+            // Admin only APIs
             .service(
                 web::scope("")
                     .wrap_fn(|req, srv| {
-                        let result = match check_login(
+                        let result = match login::check_admin(
                             &req,
                             req.app_data::<web::Data<AuthSettings>>().unwrap(),
                         ) {
