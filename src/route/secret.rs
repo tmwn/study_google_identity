@@ -1,7 +1,6 @@
 use crate::{auth::claim::Claims, helper::error_chain_fmt};
 use actix_web::{body::AnyBody, HttpRequest, HttpResponse, ResponseError};
 
-
 use reqwest::StatusCode;
 
 #[derive(thiserror::Error)]

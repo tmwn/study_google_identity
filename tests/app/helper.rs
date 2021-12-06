@@ -5,6 +5,7 @@ pub struct TestApp {
 }
 
 pub async fn spawn_app() -> TestApp {
+    std::env::set_var("SECRET", "12345");
     let configuration = {
         let mut c = get_configuration();
         // Use a random OS port.

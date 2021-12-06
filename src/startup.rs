@@ -48,6 +48,7 @@ pub fn run(listener: TcpListener, settings: Settings) -> std::io::Result<Server>
             .app_data(application_settings.clone())
             .route("/login", web::get().to(login))
             .route("/login", web::post().to(login_endpoint))
+            .route("/health_check", web::get().to(health_check))
             .service(
                 web::scope("")
                     .wrap_fn(|req, srv| {
@@ -69,8 +70,7 @@ pub fn run(listener: TcpListener, settings: Settings) -> std::io::Result<Server>
                             }
                         }
                     })
-                    .route("/secret", web::get().to(secret))
-                    .route("/health_check", web::get().to(health_check)),
+                    .route("/secret", web::get().to(secret)),
             )
     })
     .listen(listener)?
