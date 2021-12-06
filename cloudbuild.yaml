@@ -42,7 +42,7 @@ images:
   - "$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA"
 options:
   substitutionOption: ALLOW_LOOSE
-  machineType: "N1_HIGHCPU_8"
+  machineType: "N1_HIGHCPU_32"
 substitutions:
   _SERVICE_NAME: study-google-identity
   _LABELS: gcb-trigger-id=c67420f1-ff81-4486-93a6-7f37d7343d8c
