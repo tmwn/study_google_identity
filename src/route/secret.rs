@@ -32,18 +32,9 @@ impl ResponseError for SecretError {
     }
 }
 
-pub async fn secret<'a>(
-    req: HttpRequest,
-    settings: web::Data<AuthSettings>,
-) -> Result<HttpResponse, SecretError> {
-    let token = req
-        .cookie("login_token")
-        .ok_or_else(|| SecretError::AuthError(anyhow!("credential not found in cookie")))?;
-    let data = decode::<Claims>(
-        token.value(),
-        &settings.decoding_key,
-        &Validation::default(),
-    )
-    .map_err(|e| SecretError::AuthError(anyhow!("decode failed: {}", e)))?;
-    Ok(HttpResponse::Ok().body(format!("{} got secret", data.claims.id.email)))
+pub async fn secret<'a>(req: HttpRequest) -> Result<HttpResponse, SecretError> {
+    match req.extensions().get::<Claims>() {
+        Some(claims) => Ok(HttpResponse::Ok().body(format!("{} got secret", claims.id.email))),
+        None => panic!("Error"),
+    }
 }

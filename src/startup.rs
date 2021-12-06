@@ -1,12 +1,15 @@
 use std::net::TcpListener;
 
-use actix_web::{dev::Server, web, App, HttpServer};
+use actix_web::{
+    dev::{Server, Service},
+    web, App, HttpServer,
+};
 
 use crate::{
-    configuration::Settings,
+    configuration::{AuthSettings, Settings},
     route::{
         health_check::health_check,
-        login::{login, login_endpoint},
+        login::{check_login, login, login_endpoint},
         secret::secret,
     },
 };
@@ -35,17 +38,40 @@ impl Application {
     }
 }
 
-pub fn run<'a>(listener: TcpListener, settings: Settings) -> std::io::Result<Server> {
+pub fn run(listener: TcpListener, settings: Settings) -> std::io::Result<Server> {
     let auth_settings = web::Data::new(settings.auth);
     let application_settings = web::Data::new(settings.application);
+
     let server = HttpServer::new(move || {
         App::new()
-            .route("/health_check", web::get().to(health_check))
-            .route("/secret", web::get().to(secret))
-            .route("/login", web::get().to(login))
-            .route("/login", web::post().to(login_endpoint))
             .app_data(auth_settings.clone())
             .app_data(application_settings.clone())
+            .route("/login", web::get().to(login))
+            .route("/login", web::post().to(login_endpoint))
+            .service(
+                web::scope("")
+                    .wrap_fn(|req, srv| {
+                        let result = match check_login(
+                            &req,
+                            req.app_data::<web::Data<AuthSettings>>().unwrap(),
+                        ) {
+                            Ok(claims) => {
+                                req.head().extensions_mut().insert(claims);
+                                Ok(())
+                            }
+                            Err(e) => Err(e),
+                        };
+                        let fut = srv.call(req);
+                        async move {
+                            match result {
+                                Ok(_) => fut.await,
+                                Err(e) => Err(e.into()),
+                            }
+                        }
+                    })
+                    .route("/secret", web::get().to(secret))
+                    .route("/health_check", web::get().to(health_check)),
+            )
     })
     .listen(listener)?
     .run();

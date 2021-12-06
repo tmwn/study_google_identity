@@ -1,9 +1,11 @@
+use std::future::{ready, Ready};
 use std::time::SystemTime;
 
 use actix_web::body::AnyBody;
-use actix_web::ResponseError;
+use actix_web::dev::{Service, ServiceRequest, ServiceResponse, Transform};
 use actix_web::{cookie::Cookie, http::HeaderValue, web, HttpResponse, Responder};
-use jsonwebtoken::{encode, Header};
+use actix_web::{Error, HttpRequest, ResponseError};
+use jsonwebtoken::{decode, encode, Header, Validation};
 use reqwest::header;
 use reqwest::StatusCode;
 use serde::Deserialize;
@@ -109,4 +111,18 @@ pub async fn login_endpoint(
     let cookie = Cookie::build("login_token", token).http_only(true).finish();
     res.add_cookie(&cookie).unwrap();
     Ok(res)
+}
+
+pub fn check_login(req: &ServiceRequest, settings: &AuthSettings) -> Result<Claims, LoginError> {
+    let token = req
+        .cookie("login_token")
+        .ok_or_else(|| LoginError::AuthError(anyhow::anyhow!("credential not found in cookie")))?;
+
+    let data = decode::<Claims>(
+        token.value(),
+        &settings.decoding_key,
+        &Validation::default(),
+    )
+    .map_err(|e| LoginError::AuthError(anyhow::anyhow!("decode failed: {}", e)))?;
+    Ok(data.claims)
 }
