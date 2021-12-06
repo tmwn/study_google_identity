@@ -25,7 +25,7 @@ pub struct AuthSettings {
     pub decoding_key: DecodingKey<'static>,
 }
 
-pub fn get_configuration<'a>() -> Settings {
+pub fn get_configuration() -> Settings {
     let secret = std::env::var("SECRET").unwrap();
     if secret.len() < 3 {
         panic!("Secret too short");

@@ -1,10 +1,10 @@
-use std::future::{ready, Ready};
+
 use std::time::SystemTime;
 
 use actix_web::body::AnyBody;
-use actix_web::dev::{Service, ServiceRequest, ServiceResponse, Transform};
+use actix_web::dev::{ServiceRequest};
 use actix_web::{cookie::Cookie, http::HeaderValue, web, HttpResponse, Responder};
-use actix_web::{Error, HttpRequest, ResponseError};
+use actix_web::{ResponseError};
 use jsonwebtoken::{decode, encode, Header, Validation};
 use reqwest::header;
 use reqwest::StatusCode;
